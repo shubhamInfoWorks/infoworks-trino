@@ -12,11 +12,14 @@
  * limitations under the License.
  */
 package io.trino.plugin.databricks;
-public class TestMySqlTableStatisticsMySql5IndexStatistics
-        extends BaseMySqlTableStatisticsIndexStatisticsTest
+
+import io.trino.operator.RetryPolicy;
+
+public class TestPostgresTaskFailureRecoveryTest
+        extends BasePostgresFailureRecoveryTest
 {
-    public TestMySqlTableStatisticsMySql5IndexStatistics()
+    public TestPostgresTaskFailureRecoveryTest()
     {
-        super("databricks:5.5.46"); // oldest available on RDS
+        super(RetryPolicy.TASK);
     }
 }

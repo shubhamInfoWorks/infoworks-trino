@@ -15,11 +15,13 @@ package io.trino.plugin.databricks;
 
 import io.trino.plugin.jdbc.JdbcPlugin;
 
+import static io.airlift.configuration.ConfigurationAwareModule.combine;
+
 public class DatabricksPlugin
         extends JdbcPlugin
 {
     public DatabricksPlugin()
     {
-        super("databricks", new DatabricksClientModule());
+        super("databricks", combine(new DatabricksClientModule(), new DatabricksConnectionFactoryModule()));
     }
 }

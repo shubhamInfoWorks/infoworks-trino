@@ -14,43 +14,41 @@
 package io.trino.plugin.databricks;
 
 import com.google.common.collect.ImmutableMap;
-import io.airlift.units.Duration;
 import org.testng.annotations.Test;
 
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static io.airlift.configuration.testing.ConfigAssertions.assertFullMapping;
 import static io.airlift.configuration.testing.ConfigAssertions.assertRecordedDefaults;
 import static io.airlift.configuration.testing.ConfigAssertions.recordDefaults;
 
-public class TestMySqlConfig
+public class TestDatabricksConfig
 {
     @Test
     public void testDefaults()
     {
         assertRecordedDefaults(recordDefaults(DatabricksConfig.class)
-                .setAutoReconnect(true)
-                .setMaxReconnects(3)
-                .setConnectionTimeout(new Duration(10, TimeUnit.SECONDS))
-                .setDriverUseInformationSchema(true));
+                .setDisableAutomaticFetchSize(false)
+                .setArrayMapping(DatabricksConfig.ArrayMapping.DISABLED)
+                .setIncludeSystemTables(false)
+                .setEnableStringPushdownWithCollate(false));
     }
 
     @Test
     public void testExplicitPropertyMappings()
     {
         Map<String, String> properties = ImmutableMap.<String, String>builder()
-                .put("mysql.auto-reconnect", "false")
-                .put("mysql.max-reconnects", "4")
-                .put("mysql.connection-timeout", "4s")
-                .put("mysql.jdbc.use-information-schema", "false")
+                .put("postgresql.disable-automatic-fetch-size", "true")
+                .put("postgresql.array-mapping", "AS_ARRAY")
+                .put("postgresql.include-system-tables", "true")
+                .put("postgresql.experimental.enable-string-pushdown-with-collate", "true")
                 .buildOrThrow();
 
         DatabricksConfig expected = new DatabricksConfig()
-                .setAutoReconnect(false)
-                .setMaxReconnects(4)
-                .setConnectionTimeout(new Duration(4, TimeUnit.SECONDS))
-                .setDriverUseInformationSchema(false);
+                .setDisableAutomaticFetchSize(true)
+                .setArrayMapping(DatabricksConfig.ArrayMapping.AS_ARRAY)
+                .setIncludeSystemTables(true)
+                .setEnableStringPushdownWithCollate(true);
 
         assertFullMapping(properties, expected);
     }

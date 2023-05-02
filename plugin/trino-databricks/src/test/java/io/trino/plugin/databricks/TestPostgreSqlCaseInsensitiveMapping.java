@@ -13,8 +13,8 @@
  */
 package io.trino.plugin.databricks;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.trino.plugin.jdbc.BaseCaseInsensitiveMappingTest;
 import io.trino.testing.QueryRunner;
 import io.trino.testing.sql.SqlExecutor;
@@ -22,7 +22,6 @@ import org.testng.annotations.Test;
 
 import java.nio.file.Path;
 
-import static io.trino.plugin.databricks.MySqlQueryRunner.createMySqlQueryRunner;
 import static io.trino.plugin.jdbc.mapping.RuleBasedIdentifierMappingUtils.REFRESH_PERIOD_DURATION;
 import static io.trino.plugin.jdbc.mapping.RuleBasedIdentifierMappingUtils.createRuleBasedIdentifierMappingFile;
 import static java.util.Objects.requireNonNull;
@@ -30,27 +29,27 @@ import static java.util.Objects.requireNonNull;
 // With case-insensitive-name-matching enabled colliding schema/table names are considered as errors.
 // Some tests here create colliding names which can cause any other concurrent test to fail.
 @Test(singleThreaded = true)
-public class TestMySqlCaseInsensitiveMapping
+public class TestPostgreSqlCaseInsensitiveMapping
         extends BaseCaseInsensitiveMappingTest
 {
     private Path mappingFile;
-    private TestingMySqlServer mySqlServer;
+    private TestingPostgreSqlServer postgreSqlServer;
 
     @Override
     protected QueryRunner createQueryRunner()
             throws Exception
     {
         mappingFile = createRuleBasedIdentifierMappingFile();
-        mySqlServer = closeAfterClass(new TestingMySqlServer());
-        return createMySqlQueryRunner(
-                mySqlServer,
+        postgreSqlServer = closeAfterClass(new TestingPostgreSqlServer());
+        return PostgreSqlQueryRunner.createPostgreSqlQueryRunner(
+                postgreSqlServer,
                 ImmutableMap.of(),
                 ImmutableMap.<String, String>builder()
                         .put("case-insensitive-name-matching", "true")
                         .put("case-insensitive-name-matching.config-file", mappingFile.toFile().getAbsolutePath())
                         .put("case-insensitive-name-matching.config-file.refresh-period", REFRESH_PERIOD_DURATION.toString())
                         .buildOrThrow(),
-                ImmutableList.of());
+                ImmutableSet.of());
     }
 
     @Override
@@ -62,15 +61,7 @@ public class TestMySqlCaseInsensitiveMapping
     @Override
     protected SqlExecutor onRemoteDatabase()
     {
-        return mySqlServer::execute;
-    }
-
-    @Override
-    protected String quoted(String name)
-    {
-        String identifierQuote = "`";
-        name = name.replace(identifierQuote, identifierQuote + identifierQuote);
-        return identifierQuote + name + identifierQuote;
+        return postgreSqlServer::execute;
     }
 
     @Test

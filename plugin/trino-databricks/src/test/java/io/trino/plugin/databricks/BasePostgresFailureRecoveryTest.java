@@ -23,12 +23,12 @@ import io.trino.tpch.TpchTable;
 import java.util.List;
 import java.util.Map;
 
-import static io.trino.plugin.databricks.MySqlQueryRunner.createMySqlQueryRunner;
+import static io.trino.plugin.databricks.PostgreSqlQueryRunner.createPostgreSqlQueryRunner;
 
-public abstract class BaseMySqlFailureRecoveryTest
+public abstract class BasePostgresFailureRecoveryTest
         extends BaseJdbcFailureRecoveryTest
 {
-    public BaseMySqlFailureRecoveryTest(RetryPolicy retryPolicy)
+    public BasePostgresFailureRecoveryTest(RetryPolicy retryPolicy)
     {
         super(retryPolicy);
     }
@@ -40,8 +40,8 @@ public abstract class BaseMySqlFailureRecoveryTest
             Map<String, String> coordinatorProperties)
             throws Exception
     {
-        return createMySqlQueryRunner(
-                closeAfterClass(new io.trino.plugin.databricks.TestingMySqlServer()),
+        return createPostgreSqlQueryRunner(
+                closeAfterClass(new TestingPostgreSqlServer()),
                 configProperties,
                 coordinatorProperties,
                 Map.of(),

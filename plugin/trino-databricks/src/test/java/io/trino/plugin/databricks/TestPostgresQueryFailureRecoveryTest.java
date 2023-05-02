@@ -15,10 +15,10 @@ package io.trino.plugin.databricks;
 
 import io.trino.operator.RetryPolicy;
 
-public class TestMySqlQueryFailureRecoveryTest
-        extends BaseMySqlFailureRecoveryTest
+public class TestPostgresQueryFailureRecoveryTest
+        extends BasePostgresFailureRecoveryTest
 {
-    public TestMySqlQueryFailureRecoveryTest()
+    public TestPostgresQueryFailureRecoveryTest()
     {
         super(RetryPolicy.QUERY);
     }

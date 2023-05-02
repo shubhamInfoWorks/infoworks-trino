@@ -14,71 +14,73 @@
 package io.trino.plugin.databricks;
 
 import io.airlift.configuration.Config;
-import io.airlift.configuration.ConfigDescription;
-import io.airlift.units.Duration;
+import io.airlift.configuration.LegacyConfig;
 
-import javax.validation.constraints.Min;
-
-import java.util.concurrent.TimeUnit;
+import javax.validation.constraints.NotNull;
 
 public class DatabricksConfig
 {
-    private boolean autoReconnect = true;
-    private int maxReconnects = 3;
-    private Duration connectionTimeout = new Duration(10, TimeUnit.SECONDS);
+    private boolean disableAutomaticFetchSize;
+    private ArrayMapping arrayMapping = ArrayMapping.DISABLED;
+    private boolean includeSystemTables;
+    private boolean enableStringPushdownWithCollate;
 
-    // Using `useInformationSchema=true` prevents race condition inside MySQL driver's java.sql.DatabaseMetaData.getColumns
-    // implementation, which throw SQL exception when a table disappears during listing.
-    // Using `useInformationSchema=false` may provide more diagnostic information (see https://github.com/trinodb/trino/issues/1597)
-    private boolean driverUseInformationSchema = true;
-
-    public boolean isAutoReconnect()
+    @Deprecated
+    public boolean isDisableAutomaticFetchSize()
     {
-        return autoReconnect;
+        return disableAutomaticFetchSize;
     }
 
-    @Config("mysql.auto-reconnect")
-    public DatabricksConfig setAutoReconnect(boolean autoReconnect)
+    @Deprecated // TODO temporary kill-switch, to be removed
+    @Config("postgresql.disable-automatic-fetch-size")
+    public DatabricksConfig setDisableAutomaticFetchSize(boolean disableAutomaticFetchSize)
     {
-        this.autoReconnect = autoReconnect;
+        this.disableAutomaticFetchSize = disableAutomaticFetchSize;
         return this;
     }
 
-    @Min(1)
-    public int getMaxReconnects()
+    public enum ArrayMapping
     {
-        return maxReconnects;
+        DISABLED,
+        AS_ARRAY,
+        AS_JSON,
     }
 
-    @Config("mysql.max-reconnects")
-    public DatabricksConfig setMaxReconnects(int maxReconnects)
+    @NotNull
+    public ArrayMapping getArrayMapping()
     {
-        this.maxReconnects = maxReconnects;
+        return arrayMapping;
+    }
+
+    @Config("postgresql.array-mapping")
+    @LegacyConfig("postgresql.experimental.array-mapping")
+    public DatabricksConfig setArrayMapping(ArrayMapping arrayMapping)
+    {
+        this.arrayMapping = arrayMapping;
         return this;
     }
 
-    public Duration getConnectionTimeout()
+    public boolean isIncludeSystemTables()
     {
-        return connectionTimeout;
+        return includeSystemTables;
     }
 
-    @Config("mysql.connection-timeout")
-    public DatabricksConfig setConnectionTimeout(Duration connectionTimeout)
+    @Config("postgresql.include-system-tables")
+    public DatabricksConfig setIncludeSystemTables(boolean includeSystemTables)
     {
-        this.connectionTimeout = connectionTimeout;
+        this.includeSystemTables = includeSystemTables;
         return this;
     }
 
-    public boolean isDriverUseInformationSchema()
+    public boolean isEnableStringPushdownWithCollate()
     {
-        return driverUseInformationSchema;
+        return enableStringPushdownWithCollate;
     }
 
-    @Config("mysql.jdbc.use-information-schema")
-    @ConfigDescription("Value of useInformationSchema MySQL JDBC driver connection property")
-    public DatabricksConfig setDriverUseInformationSchema(boolean driverUseInformationSchema)
+    @Config("postgresql.experimental.enable-string-pushdown-with-collate")
+    public DatabricksConfig setEnableStringPushdownWithCollate(boolean enableStringPushdownWithCollate)
     {
-        this.driverUseInformationSchema = driverUseInformationSchema;
+        this.enableStringPushdownWithCollate = enableStringPushdownWithCollate;
         return this;
     }
 }

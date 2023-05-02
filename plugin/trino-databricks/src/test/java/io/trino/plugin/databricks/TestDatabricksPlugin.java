@@ -20,22 +20,14 @@ import io.trino.testing.TestingConnectorContext;
 import org.testng.annotations.Test;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class TestMySqlPlugin
+public class TestDatabricksPlugin
 {
     @Test
     public void testCreateConnector()
     {
         Plugin plugin = new DatabricksPlugin();
         ConnectorFactory factory = getOnlyElement(plugin.getConnectorFactories());
-
-        factory.create("test", ImmutableMap.of("connection-url", "jdbc:mysql://test"), new TestingConnectorContext()).shutdown();
-
-        assertThatThrownBy(() -> factory.create("test", ImmutableMap.of("connection-url", "test"), new TestingConnectorContext()))
-                .hasMessageContaining("Invalid JDBC URL for MySQL connector");
-
-        assertThatThrownBy(() -> factory.create("test", ImmutableMap.of("connection-url", "jdbc:mysql://test/abc"), new TestingConnectorContext()))
-                .hasMessageContaining("Database (catalog) must not be specified in JDBC URL for MySQL connector");
+        factory.create("test", ImmutableMap.of("connection-url", "jdbc:postgresql:test"), new TestingConnectorContext()).shutdown();
     }
 }
